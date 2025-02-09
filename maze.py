@@ -1,89 +1,55 @@
 maze = [
-    [0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
-    [0, 1, 0, 1, 0, 1, 1, 1, 1, 0],
-    [0, 1, 0, 1, 0, 1, 0, 0, 1, 0],
-    [0, 1, 0, 1, 1, 1, 0, 1, 1, 0],
-    [0, 1, 0, 0, 0, 0, 0, 1, 0, 0],
-    [0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-    [0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-    [0, 1, 1, 1, 1, 1, 1, 0, 1, 0],
-    [0, 1, 0, 0, 0, 0, 1, 1, 1, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
-]
+    [1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 1, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 1, 1, 1, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 1, 1, 0, 0],
+    [1, 1, 1, 1, 1, 0, 0, 1, 0, 0],
+    [0, 0, 0, 0, 1, 1, 1, 1, 1, 1],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
+    [0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 1, 1, 1, 1]
+]# this a new branch
 
-tm = [
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-]
+direction = [(0,1),(0,-1),(-1,0),(1,0)]  # Right, Left, Up, Down
 
-points = []  # to track junctions
+start = (0,0) 
 
-row, col = 0, 1  # Start position
+row = len(maze)
 
-def check():
-    global row, col, points, maze, tm
+col = len(maze[0])
 
-    option = {"up": 0, "down": 0, "right": 0, "left": 0}
-    count = 0
+end = (row-1, col-2)
 
-    tm[row][col] = 1  # Mark current position as visited
+path = [(0,0)]     # Stack
 
-    if col < 9 and maze[row][col + 1] == 1 and tm[row][col + 1] != 1:  # Right
-        option["right"] = 1
-        count += 1
+while path:              # While stack is not empty
 
-    if col > 0 and maze[row][col - 1] == 1 and tm[row][col - 1] != 1:  # Left
-        option["left"] = 1
-        count += 1
 
-    if row > 0 and maze[row - 1][col] == 1 and tm[row - 1][col] != 1:  # Up
-        option["up"] = 1
-        count += 1
+    temp = list(path)
 
-    if row < 9 and maze[row + 1][col] == 1 and tm[row + 1][col] != 1:  # Down
-        option["down"] = 1
-        count += 1
+    (x,y) = path.pop()
 
-    if count > 1:  # Junction point
-        points.append((row, col, option))
+    if (x,y) == end:
 
-    if count == 0:  # Dead end, backtrack
-        if points:
-            row, col, option = points.pop()
-        else:
-            print("No solution found")
-            exit()  # Stop execution if no path
-
-while True:
-    check()
-
-    if row == 9:  # Reached the last row
-        print("Path found!")
+        print("The Path: ",path)
         break
 
-    if points:
-        _, _, option = points[-1]  # Get last junction's option
+    maze[x][y] = 0   # Mark as visited
 
-        if option["right"]:
-            col += 1
-            option["right"] = 0
-        elif option["left"]:
-            col -= 1
-            option["left"] = 0
-        elif option["up"]:
-            row -= 1
-            option["up"] = 0
-        elif option["down"]:
-            row += 1
-            option["down"] = 0
+    for dx, dy in direction:    # This loop is to add all the possible directoin in the stack.
 
-    tm[row][col] = 1
-    print(row, col)  # Print the path taken
+        nx = x + dx      # for checking the nearby cells using the direction
+        ny = y + dy
+
+        if 0 <= nx < row and 0 <= ny < col and maze[nx][ny] == 1:
+
+            path = temp + [(nx,ny)]
+    
+else:
+
+    print("No path found")
+
+
+
+# when reaching a dead end the if condition wont satisfy, hencing back tracking until a path or the junction is found
